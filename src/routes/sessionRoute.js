@@ -1,0 +1,8 @@
+const express = require('express');
+const Router = express.Router();
+const sessionController = require('../controllers/sessionController');
+
+Router.get('/healthz', sessionController.getHealth);
+Router.post('/v1/sessions', sessionController.createSession);
+
+module.exports = Router;

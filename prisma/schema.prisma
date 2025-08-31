@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Photo {
+  id           String      @id @default(uuid())
+  title        String
+  imageUrl     String
+  naturalWidth Int?
+  naturalHeight Int?
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  characters   Character[]
+
+  GameSession GameSession[]
+}
+
+model Character {
+  id        String   @id @default(uuid())
+  name      String
+  photo     Photo    @relation(fields: [photoId], references: [id])
+  photoId   String
+  boxX      Float
+  boxY      Float
+  boxW      Float
+  boxH      Float
+
+  @@unique([photoId, name])
+  Guess Guess[]
+}
+
+model GameSession {
+  id         String    @id @default(uuid())
+  photo      Photo     @relation(fields: [photoId], references: [id])
+  photoId    String
+  startedAt  DateTime  @default(now())
+  completedAt DateTime?
+  status     SessionStatus @default(CREATED)
+  foundCount Int       @default(0)
+  guesses    Guess[]
+
+  Score Score[]
+}
+
+model Guess {
+  id          String   @id @default(uuid())
+  session     GameSession @relation(fields: [sessionId], references: [id])
+  sessionId   String
+  character   Character @relation(fields: [characterId], references: [id])
+  characterId String
+  guessX      Float
+  guessY      Float
+  isCorrect   Boolean
+  createdAt   DateTime @default(now())
+}
+
+model Score {
+  id         String   @id @default(uuid())
+  session    GameSession @relation(fields: [sessionId], references: [id])
+  sessionId  String   @unique
+  playerName String
+  durationMs Int
+  createdAt  DateTime @default(now())
+}
+
+enum SessionStatus {
+  CREATED
+  COMPLETED
+  ABANDONED
+}
