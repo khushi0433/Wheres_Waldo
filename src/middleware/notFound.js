@@ -1,12 +1,9 @@
 // middleware/notFound.js
 function notFound(req, res, next) {
-    res.status(404).json({
-      success: false,
-      error: {
-        message: `Not Found - ${req.originalUrl}`
-      }
-    });
-  }
-  
-  module.exports = notFound;
+    const error = new Error(`Not Found - ${req.originalUrl}`);
+    res.status(404);
+    next(error);
+}
+
+module.exports = notFound;
   

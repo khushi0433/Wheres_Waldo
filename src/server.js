@@ -15,14 +15,22 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+app.use(cors({ 
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true 
+}));
 
 const PORT = process.env.PORT || 4000;
+
+// app.get('/', (req,res) => {
+  //  res.send('Is API Working?');
+// })
 
 app.use('/', sessionRoutes);
 app.use('/', guessesRoutes);
 app.use('/', PhotoRoute);
 app.use('/', completedRoute);
+
 
 app.use(errorHandler);
 app.use(notFound);
