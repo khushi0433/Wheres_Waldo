@@ -1,5 +1,7 @@
 // API service for backend communication
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+const FRONTEND_URL = 'http://localhost:5173';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'; // Default base URL
+export { FRONTEND_URL };
 
 class ApiService {
   constructor() {
@@ -9,6 +11,9 @@ class ApiService {
   // Helper method for making API calls
   async makeRequest(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    
+    console.log('Making API request to:', url);
+    console.log('Request options:', options);
     
     const defaultOptions = {
       credentials: 'include', // Include cookies
@@ -30,12 +35,18 @@ class ApiService {
     try {
       const response = await fetch(url, config);
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('API error response:', errorData);
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      console.log('API response data:', data);
+      return data;
     } catch (error) {
       console.error('API request failed:', error);
       throw error;
@@ -95,3 +106,4 @@ class ApiService {
 // Create and export a singleton instance
 const apiService = new ApiService();
 export default apiService;
+

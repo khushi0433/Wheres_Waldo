@@ -162,7 +162,7 @@ const Gameboard = ({ photoData, onGameComplete }) => {
               }}
             >
               ✓
-            </div>
+      </div>
           );
         })}
 
@@ -215,12 +215,12 @@ const Gameboard = ({ photoData, onGameComplete }) => {
               >
                 Submit Score
               </button>
-              <button 
+      <button
                 onClick={() => setShowNameModal(false)}
                 className="px-6 py-3 bg-white/20 text-white border-2 border-white/30 rounded-lg text-base font-medium cursor-pointer transition-all duration-300 min-w-32 hover:bg-white/30"
-              >
+      >
                 Skip
-              </button>
+      </button>
             </div>
           </div>
         </div>

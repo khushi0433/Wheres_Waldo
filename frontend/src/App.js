@@ -15,14 +15,17 @@ function App() {
 
   const initializeGame = async (photoId) => {
     try {
+      console.log('Initializing game with photoId:', photoId);
       setError(null);
       setGameState('loading');
       
       const data = await apiService.createSession(photoId);
+      console.log('Session created successfully:', data);
       setPhotoData(data.photo);
       setSessionId(data.sessionId);
       setGameState('playing');
     } catch (err) {
+      console.error('Error initializing game:', err);
       setError('Failed to start game. Please refresh the page.');
       setGameState('error');
     }
