@@ -1,17 +1,15 @@
 const { PrismaClient } = require('@prisma/client');
-const { COOKIE_NAME, ADMIN_SECRET } = require('../config');
-
 const prisma = new PrismaClient();
 
 const photoController = {
+    // Fetch leaderboard for a specific photo
     leaderboard: async (req, res, next) => {
         try {
             const { photoId } = req.query;
             if (!photoId) {
-                return res.status(400).json({ error: 'photoId is required'});
+                return res.status(400).json({ error: 'photoId is required' });
             }
 
-            // Use Prisma relations instead of raw SQL
             const scores = await prisma.score.findMany({
                 where: {
                     session: {
@@ -21,29 +19,46 @@ const photoController = {
                 select: {
                     playerName: true,
                     durationMs: true,
-                    createdAt: true
-                },
-                orderBy: {
-                    durationMs: 'asc'
-                },
-                take: 10
+                }
             });
 
-            res.json({ photoId, scores });
+            if (scores.length === 0) {
+                return res.status(404).json({ error: 'No scores found for this photoId' });
+            }
+
+            res.json(scores);
         } catch (error) {
+            console.error('Error fetching leaderboard:', error);
             next(error);
         }
-    },      
+    },
 
+    // Create a new photo
     createPhoto: async (req, res, next) => {
         try {
-            if (req.headers['x-admin-secret'] !== ADMIN_SECRET) {
-                return res.status(401).json({ error: 'unauthorized' });
+            const { name, url, characters } = req.body;
+
+            if (!name || !url || !characters || !Array.isArray(characters)) {
+                return res.status(400).json({ error: 'name, url, and characters (array) are required' });
             }
-            const { title, imageUrl } = req.body;
-            const p = await prisma.photo.create({ data: { title, imageUrl }});
-            res.json(p);
+
+            const photo = await prisma.photo.create({
+                data: {
+                    name,
+                    url,
+                    characters: {
+                        create: characters.map((character) => ({
+                            name: character.name,
+                            x: character.x,
+                            y: character.y,
+                        })),
+                    },
+                },
+            });
+
+            res.status(201).json(photo);
         } catch (error) {
+            console.error('Error creating photo:', error);
             next(error);
         }
     }

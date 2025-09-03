@@ -15,27 +15,28 @@ const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ 
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
-  credentials: true 
+app.use(cors({
+  origin: process.env.FRONTEND_URL || ["http://localhost:5173", "http://localhost:4000"],
+  credentials: true
 }));
 
-const PORT = process.env.PORT || 4000;
 
-// app.get('/', (req,res) => {
-  //  res.send('Is API Working?');
-// })
+app.get('/', (req,res) => {
+   res.send('Is API Working?');
+});
 
-app.use('/', sessionRoutes);
-app.use('/', guessesRoutes);
-app.use('/', PhotoRoute);
-app.use('/', completedRoute);
+app.use('/v1/sessions', sessionRoutes);
+app.use('/v1/guesses', guessesRoutes);
+app.use('/v1/photos', PhotoRoute);
+app.use('/v1/completed', completedRoute);
 
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 app.use(errorHandler);
 app.use(notFound);
 
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });
